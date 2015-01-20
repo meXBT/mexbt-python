@@ -31,7 +31,6 @@ api.ticker()
 api.orders()
 api.trades()
 api.currency_pairs()
-api.currency_pairs()
 ```
 
 ## Private API

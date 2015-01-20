@@ -49,3 +49,7 @@ api.account_trades(start_index=-1, count=10)
 api.account_addresses()
 api.withdraw(1.23456789, 'foo')
 ```
+
+## Acknowledgements
+
+Thanks to [GP](https://github.com/g-p-g) at [Coinapult](https://coinapult.com/) who wrote 99.99% of this client :)

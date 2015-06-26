@@ -4,6 +4,7 @@ import time
 import hashlib
 
 import requests
+from decimal import Decimal
 
 class Mexbt:
 
@@ -130,7 +131,8 @@ class Mexbt:
 
     def account_balance(self):
         """Fetches balance information."""
-        return self._private('balance')
+        json_balance = self._private('balance')
+        return { balance_info['name'] : { 'balance': balance_info['balance'], 'hold': balance_info['hold']} for balance_info in json_balance['currencies'] }
 
     def account_orders(self):
         """Fetches open orders."""
@@ -141,5 +143,27 @@ class Mexbt:
         return self._private('deposit-addresses')
 
     def withdraw(self, amount, address, currency='btc'):
+        amount = str(round(Decimal(amount), 8))
         return self._private('withdraw', ins=currency, amount=amount,
                              sendToAddress=address)
+
+    def estimate_coins_bought(self, fiat_to_spend, currency='mxn'):
+        coins = 0
+        spent = 0
+        pair = "btc%s" % currency
+        order_book = self.order_book(pair)
+        asks = order_book["asks"]
+        for ask in asks:
+            cost = ask["qty"] * ask["px"]
+            if cost + spent > fiat_to_spend:
+                left_to_spend = fiat_to_spend - spent
+                percentage_bought = left_to_spend / cost
+                bought = ask["qty"] * percentage_bought
+                coins += bought
+                return coins
+            else:
+                coins += ask["qty"]
+                spent += cost
+                if spent == fiat_to_spend:
+                    return coins
+        return coins

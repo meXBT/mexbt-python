@@ -9,7 +9,7 @@ from decimal import Decimal
 class Mexbt:
 
     def __init__(self, pair=None, sandbox=False, **kwargs):
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             if any(key in i for i in ['public_key', 'private_key', 'user_id']):
                 setattr(self, key, value)
 
@@ -43,8 +43,8 @@ class Mexbt:
                 raise Exception('You must configure %s to make private calls' % k)
 
         nonce = int(time.time() * 10000)
-        sign = hmac.new(self.private_key,
-                        '%s%s%s' % (nonce, self.user_id, self.public_key),
+        sign = hmac.new(self.private_key.encode(),
+                        ('%s%s%s' % (nonce, self.user_id, self.public_key)).encode(),
                         hashlib.sha256).hexdigest().upper()
         params = {'apiKey': self.public_key, 'apiNonce': nonce, 'apiSig': sign}
 
